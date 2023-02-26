@@ -24,8 +24,14 @@ function run() {
         // post kora
         app.post('/post', async (req, res) => {
             const post = req.body;
-            console.log(post)
+
             const result = await PostsCollection.insertOne(post)
+            res.send(result)
+        })
+
+        app.post('/users', async (req, res) => {
+            const post = req.body;
+            const result = await UserCollection.insertOne(post)
             res.send(result)
         })
 
@@ -40,7 +46,7 @@ function run() {
         // get all of the post
         app.get('/allpost', async (req, res) => {
             const query = {}
-            const result = await PostsCollection.find(query).sort({ liking: -1 }).limit(100).toArray();
+            const result = await PostsCollection.find(query).sort({ date: -1 }).limit(100).toArray();
             res.send(result)
         })
 
@@ -65,16 +71,41 @@ function run() {
             );
             res.send(result);
         });
+
+        // comment rumel
+        app.post("/post/comment/:id", async (req, res) => {
+            const post = req.body;
+
+            const result = await commentCollection.insertOne(post);
+            res.send(result);
+        });
+        // comment every post by all users rumel
+        app.get("/post/comment/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = {
+                commentId: id,
+            };
+            const result = await commentCollection.find(query).toArray();
+            res.send(result);
+
+        });
+
+        // delete 
+        app.delete("/post/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await PostsCollection.deleteOne(query);
+            // console.log(result)
+            res.send(result);
+        });
+
+
         // app.post('/comment', async (req, res) => {
         //     const post = req.body;
         //     const result = await commentCollection.insertOne(post)
         //     res.send(result)
         // })
-        // app.post('/users', async (req, res) => {
-        //     const post = req.body;
-        //     const result = await UserCollection.insertOne(post)
-        //     res.send(result)
-        // })
+
 
         // app.get('/comment/:id', async (req, res) => {
         //     const comment_id = req.params.id;
