@@ -11,7 +11,7 @@ app.use(express.json())
 
 
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
-const uri = "mongodb+srv://Inchat:1mRtickqeQHdtjLf@clusterfit.lgaupy2.mongodb.net/?retryWrites=true&w=majority";
+const uri = `mongodb+srv://${process.env.USER}:${process.env.USER_PASS}@clusterfit.lgaupy2.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
 function run() {
@@ -98,7 +98,25 @@ function run() {
             // console.log(result)
             res.send(result);
         });
+        app.put("/post/edit/:id", async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) }
+            const posts = req.body;
+            const option = { upsert: true };
+            const updatedUser = {
+                $set: {
+                    post: posts.post,
+                    image: posts.image,
 
+                },
+            };
+            const result = await PostsCollection.updateMany(
+                filter,
+                updatedUser,
+                option
+            );
+            res.send(result);
+        });
 
         // app.post('/comment', async (req, res) => {
         //     const post = req.body;
